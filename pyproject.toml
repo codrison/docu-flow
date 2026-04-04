@@ -1,0 +1,12 @@
+[project]
+name = "docuflow"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "langchain-google-vertexai>=3.2.2",
+    "langchain[google-genai]>=1.2.15",
+    "python-dotenv>=1.2.2",
+    "requests>=2.33.1",
+]
