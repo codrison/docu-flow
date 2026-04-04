@@ -15,8 +15,13 @@
 
 
 from ingestion.loader import DataLoader
+from ingestion.chunker import Chunker
+from config import IngestionConfig
 
 if __name__ == "__main__":
     data_loader = DataLoader("./sample.json")
     documents = data_loader.load()
-    print(documents)
+    chunker = Chunker(IngestionConfig())
+    print("These are the chunks")
+    chunks = chunker.chunk(documents)
+    print(chunks)   

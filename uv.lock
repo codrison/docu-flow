@@ -432,6 +432,7 @@ dependencies = [
     { name = "langchain", extra = ["google-genai"] },
     { name = "langchain-community" },
     { name = "langchain-google-vertexai" },
+    { name = "langchain-text-splitters" },
     { name = "python-dotenv" },
     { name = "requests" },
 ]
@@ -442,6 +443,7 @@ requires-dist = [
     { name = "langchain", extras = ["google-genai"], specifier = ">=1.2.15" },
     { name = "langchain-community", specifier = ">=0.4.1" },
     { name = "langchain-google-vertexai", specifier = ">=3.2.2" },
+    { name = "langchain-text-splitters", specifier = ">=1.1.1" },
     { name = "python-dotenv", specifier = ">=1.2.2" },
     { name = "requests", specifier = ">=2.33.1" },
 ]
