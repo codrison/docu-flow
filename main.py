@@ -1,12 +1,13 @@
-import os
-from dotenv import load_dotenv
-from langchain.chat_models import init_chat_model
+from config import ModelConfig
 
-load_dotenv(".env.local")
+api_key = "AIzaSyC5SmZITz7OHNFoLC4znygVDE7WmcOOL4w"
 
-api_key = os.getenv("GEMINI_API_KEY")
+config = ModelConfig(provider="google", model_name="gemini-2.5-flash", api_key=api_key)
 
-model = init_chat_model("google_genai:gemini-2.5-flash-lite", api_key=api_key)
 
-response = model.invoke("Hi, How are you?")
-print(response.content)
+if __name__ == "__main__":
+    from services.chat_service import ChatService
+
+    chat_service = ChatService(config)
+    output = chat_service.chat("How are you?")
+    print(output)

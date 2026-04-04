@@ -1,4 +1,4 @@
-from base import BaseProvider
+from providers.base import BaseProvider
 from config import ModelConfig
 
 from langchain_google_genai import ChatGoogleGenerativeAI

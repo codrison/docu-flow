@@ -14,3 +14,10 @@ class ProvideFactory:
         if not provider_class:
             raise ValueError(f"Unsupported provider: {config.provider}")
         return provider_class(config)
+    
+
+
+config = ModelConfig(provider="google", model_name="gemini-1.5-pro", api_key="your_api_key")
+provider = ProvideFactory.get_provider(config)
+model = provider.get_model()
+print(model)
