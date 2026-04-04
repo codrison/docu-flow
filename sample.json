@@ -1,0 +1,6 @@
+{
+    "title": "DocuFlow Test",
+    "content": "This is a test document for DocuFlow. It contains some sample text to test our document loader and chunker pipeline.",
+    "author": "Hanan",
+    "date": "2026-04-04"
+}

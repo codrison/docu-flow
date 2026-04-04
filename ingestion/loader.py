@@ -1,10 +1,11 @@
 import os
-from langchain_community.document_loaders import JSONLoader, CSVLoader,PyPDFLoader
+from langchain_community.document_loaders import JSONLoader, CSVLoader,PyPDFLoader, TextLoader
 
 LOADERS = {
     "json": JSONLoader,
     "csv": CSVLoader,
     "pdf": PyPDFLoader,
+    "txt": TextLoader,
 }
 
 class DataLoader:
@@ -16,6 +17,10 @@ class DataLoader:
         if not self.loader_class:
             raise ValueError(f"Unsupported data type: {data_type}")
         
+    
     def load(self):
-        loader = self.loader_class(self.file_path)
+        if isinstance(self.loader_class, type) and self.loader_class.__name__ == "JSONLoader":
+            loader = self.loader_class(self.file_path, jq_schema=".", text_content=False)
+        else:
+            loader = self.loader_class(self.file_path)
         return loader.load()
