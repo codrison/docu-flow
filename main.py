@@ -62,7 +62,7 @@ google_api_key = os.getenv("GEMINI_API_KEY")
 
 from services.rag_service import RAGService
 from services.chat_service import ChatService
-from services.conversation_service import ConversationService
+from storage.conversation import InMemory
 from ingestion.vector_store import VectorStore
 from config import VectorStoreConfig, ModelConfig
 
@@ -90,5 +90,5 @@ if __name__ == "__main__":
     # response = rag_service.chat(query, namespace="test_namespace")
     # print("Response:", response)
 
-    conversation_service = ConversationService()
+    conversation_service = InMemory()
     print(conversation_service.conversations)

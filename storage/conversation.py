@@ -1,4 +1,4 @@
-class ConversationService:
+class InMemory:
     def __init__(self):
         self.conversations = {}
     

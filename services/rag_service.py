@@ -2,12 +2,13 @@ from config import VectorStoreConfig, ModelConfig
 
 from ingestion.vector_store import VectorStore
 from services.chat_service import ChatService
-from services.conversation_service import ConversationService
+from storage.conversation import InMemory
+from prompts.rag import build_messages
 from uuid import uuid4
 
 
 class RAGService:
-    def __init__(self, vector_store: VectorStore, chat_service: ChatService, conversation_service: ConversationService):
+    def __init__(self, vector_store: VectorStore, chat_service: ChatService, conversation_service: InMemory):
         self.vector_store = vector_store
         self.chat_service = chat_service
         self.conversation_service = conversation_service
@@ -21,8 +22,13 @@ class RAGService:
 
         # Step 2: Get history + build current prompt
         history = self.conversation_service.get_conversation(self.conversation_id)
-        current_prompt = f"Context: {relevant_docs}\n\nQuestion: {query}\nAnswer:"
-        messages = history + [{"role": "user", "content": current_prompt}]
+        
+        messages = build_messages(
+            system_prompt=ModelConfig.system_prompt,
+            history=history,
+            query=query,
+            relevant_docs=relevant_docs
+        )
 
         # Step 3: Call LLM with full context
         response = self.chat_service.chat(messages)

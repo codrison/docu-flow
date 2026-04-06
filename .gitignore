@@ -1,14 +1,49 @@
-# Python-generated files
+# Virtual environments
+.venv/
+env/
+venv/
+
+# Python caches
 __pycache__/
-*.py[oc]
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
 build/
 dist/
-wheels/
-*.egg-info
+*.egg-info/
+*.egg
+pip-wheel-metadata/
 
-# Virtual environments
-.venv
+# Coverage reports
+.coverage
+coverage.xml
+htmlcov/
+
+# Pytest
+.pytest_cache/
+
+# MyPy
+.mypy_cache/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage artifacts
+*.log
+
+# Editor / OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+
+# .env
 .env*
+.env.local
 
-# Notes
+
+# Personal Notes
 Notes.md
