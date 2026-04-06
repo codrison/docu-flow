@@ -27,3 +27,8 @@ Utility Class or Helper Class -
 **Date:** 2026-04-06
 **Decision:** Used SSE for streaming AI responses.
 **Why:** One directional only. Client asks once, server streams back. SSE is simpler.
+
+### Single Responisitly, and separation of concern
+**Date:** 2026-04-06
+**Decision**: Use separate module for RAG loop, instead of using in `chat_service.py`.
+**Why**: Separatoin of concern, one file does one thing, and one complete responsibilty.

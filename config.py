@@ -19,6 +19,10 @@ class EmbeddingConfig:
 
 
 class VectorStoreConfig:
-    def __init__(self, provider: str, api_key: str, environment: str = None):
+    def __init__(self, api_key: str, model_name: str = "llama-text-embed-v2", environment: str = None):
         self.api_key = api_key
+        self.model_name = model_name
         self.environment = environment
+
+
+print(VectorStoreConfig(api_key="time_to_update_api_key"))
