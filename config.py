@@ -16,3 +16,9 @@ class EmbeddingConfig:
         self.model_name = model_name
         self.api_key = api_key
         self.environment = environment
+
+
+class VectorStoreConfig:
+    def __init__(self, provider: str, api_key: str, environment: str = None):
+        self.api_key = api_key
+        self.environment = environment

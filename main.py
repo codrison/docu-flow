@@ -25,17 +25,29 @@
 #     chunks = chunker.chunk(documents)
 #     print(chunks)   
 
-from config import EmbeddingConfig, IngestionConfig
+from config import EmbeddingConfig, IngestionConfig, VectorStoreConfig
 from ingestion.embedder import Embedder
 from ingestion.loader import DataLoader
 from ingestion.chunker import Chunker
+from ingestion.vector_store import VectorStore
+
 
 if __name__ == "__main__":
+    print("Starting ingestion process...")
+
+
+    print("Loading documents...")
     loader = DataLoader("./sample.json")
     documents = loader.load()
-    chunker = Chunker(IngestionConfig())
+    print("Documents", documents)
+
+
+    print("Chunking documents...")
+    chunker = Chunker(IngestionConfig(chunk_size=1000, chunk_overlap=200))
     chunks = chunker.chunk(documents)
-    embedding_config = EmbeddingConfig(model_name="llama-text-embed-v2", api_key="pcsk_37VQ9v_PE1gFCN6aFXo5WfcNjHK1Pf1QWm7VEn5hpCAcuNb76AG2g9TdCpv8B3GMFh83Da")
-    embedder = Embedder(embedding_config)
-    query_embedding = embedder.embed_documents(chunks)
-    print(query_embedding)
+    print("Chunks", chunks)
+
+    print("Storing embeddings in vector store...")
+    vector_store = VectorStore(VectorStoreConfig(provider="pinecone", api_key="pcsk_37VQ9v_PE1gFCN6aFXo5WfcNjHK1Pf1QWm7VEn5hpCAcuNb76AG2g9TdCpv8B3GMFh83Da"))
+    vector_store.add_documents(chunks, namespace="test_namespace")
+    print("Ingestion process completed.")
