@@ -32,3 +32,9 @@ Utility Class or Helper Class -
 **Date:** 2026-04-06
 **Decision**: Use separate module for RAG loop, instead of using in `chat_service.py`.
 **Why**: Separatoin of concern, one file does one thing, and one complete responsibilty.
+
+
+### Context Window Management
+**Date:** 2026-04-06
+**Decision**: Instead of adding, (conversation + retrieved context) into chat, we are just storing (conversation)  `rag_service.py`, `conversation_service.py`.
+**Why**: Clean, and helps to keep context window small.

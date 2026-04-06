@@ -62,6 +62,7 @@ google_api_key = os.getenv("GEMINI_API_KEY")
 
 from services.rag_service import RAGService
 from services.chat_service import ChatService
+from services.conversation_service import ConversationService
 from ingestion.vector_store import VectorStore
 from config import VectorStoreConfig, ModelConfig
 
@@ -73,18 +74,21 @@ google_api_key = os.getenv("GEMINI_API_KEY")
 api_key = os.getenv("PINECONE_API_KEY")
 
 if __name__ == "__main__":
-    print("Starting RAG service...")
+    # print("Starting RAG service...")
 
-    # Initialize vector store
-    vector_store = VectorStore(VectorStoreConfig(api_key=api_key))
+    # # Initialize vector store
+    # vector_store = VectorStore(VectorStoreConfig(api_key=api_key))
 
-    # Initialize chat service
-    chat_service = ChatService(ModelConfig(provider="google", model_name="gemini-2.5-flash", api_key=google_api_key))
+    # # Initialize chat service
+    # chat_service = ChatService(ModelConfig(provider="google", model_name="gemini-2.5-flash", api_key=google_api_key))
 
-    # Initialize RAG service
-    rag_service = RAGService(vector_store, chat_service)
+    # # Initialize RAG service
+    # rag_service = RAGService(vector_store, chat_service, ConversationService())
 
-    # Test RAG service
-    query = "What is DocuFlow?"
-    response = rag_service.chat(query, namespace="test_namespace")
-    print("Response:", response)
+    # # Test RAG service
+    # query = "What is DocuFlow?"
+    # response = rag_service.chat(query, namespace="test_namespace")
+    # print("Response:", response)
+
+    conversation_service = ConversationService()
+    print(conversation_service.conversations)
