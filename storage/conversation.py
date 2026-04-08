@@ -16,3 +16,12 @@ class InMemory:
         if conversation_id not in self.conversations:
             raise ValueError("Conversation does not exist.")
         return self.conversations[conversation_id]
+    
+
+
+if __name__ == "__main__":
+    memory = InMemory()
+    memory.create_conversation("test_conversation")
+    # memory.add_message("test_conversation", "user", "Hello, how are you?")
+    # memory.add_message("test_conversation", "assistant", "I'm good, thank you! How can I assist you today?")
+    print(memory.get_conversation("test_conversation"))

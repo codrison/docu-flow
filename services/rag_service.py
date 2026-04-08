@@ -1,5 +1,3 @@
-from config import VectorStoreConfig, ModelConfig
-
 from ingestion.vector_store import VectorStore
 from services.chat_service import ChatService
 from storage.conversation import InMemory
@@ -12,29 +10,28 @@ class RAGService:
         self.vector_store = vector_store
         self.chat_service = chat_service
         self.conversation_service = conversation_service
-        self.conversation_id = str(uuid4())
-        self.conversation_service.create_conversation(self.conversation_id)
 
 
-    def chat(self, query, namespace):
+    def chat(self, query, namespace, model_name, api_key, conversation_id):
+
         # Step 1: Retrieve relevant documents from vector store
         relevant_docs = self.vector_store.search(query, namespace)
 
         # Step 2: Get history + build current prompt
-        history = self.conversation_service.get_conversation(self.conversation_id)
+        history = self.conversation_service.get_conversation(conversation_id)
         
         messages = build_messages(
-            system_prompt=ModelConfig.system_prompt,
+            system_prompt="Use the following retrieved documents to answer the user's question. If you don't know the answer, say you don't know.",
             history=history,
             query=query,
             relevant_docs=relevant_docs
         )
 
         # Step 3: Call LLM with full context
-        response = self.chat_service.chat(messages)
+        response = self.chat_service.chat(messages, model_name=model_name, api_key=api_key)
 
         # Step 4: Log both turns AFTER response
-        self.conversation_service.add_message(self.conversation_id, "user", query)
-        self.conversation_service.add_message(self.conversation_id, "assistant", response)
+        self.conversation_service.add_message(conversation_id, "user", query)
+        self.conversation_service.add_message(conversation_id, "assistant", response)
 
         return response
