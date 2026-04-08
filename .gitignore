@@ -45,5 +45,6 @@ Thumbs.db
 .env.local
 
 
-# Personal Notes
+# Personal Files (related to the project but not necessary for others)
 Notes.md
+practices.md
