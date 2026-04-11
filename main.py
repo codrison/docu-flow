@@ -1,94 +1,51 @@
-from config import ModelConfig
 import os
 from dotenv import load_dotenv
 
+# Load environment variables
 load_dotenv(".env.local")
 google_api_key = os.getenv("GEMINI_API_KEY")
+pinecone_api_key = os.getenv("PINECONE_API_KEY")
 
-# config = ModelConfig(provider="google", model_name="gemini-2.5-flash", api_key=google_api_key)
-
-
-# if __name__ == "__main__":
-#     from services.chat_service import ChatService
-
-#     chat_service = ChatService(config)
-#     output = chat_service.chat("How are you?")
-#     print(output)
-
-
-
-
-# from ingestion.loader import DataLoader
-# from ingestion.chunker import Chunker
-# from config import IngestionConfig
-
-# if __name__ == "__main__":
-#     data_loader = DataLoader("./sample.json")
-#     documents = data_loader.load()
-#     chunker = Chunker(IngestionConfig())
-#     chunks = chunker.chunk(documents)
-#     print(chunks)   
-
-# ........................................................
-
-
-# from config import IngestionConfig, VectorStoreConfig
-# from ingestion.loader import DataLoader
-# from ingestion.chunker import Chunker
-# from ingestion.vector_store import VectorStore
-
-
-# if __name__ == "__main__":
-#     print("Starting ingestion process...")
-
-
-#     print("Loading documents...")
-#     loader = DataLoader("./sample.json")
-#     documents = loader.load()
-#     print("Documents", documents)
-
-
-#     print("Chunking documents...")
-#     chunker = Chunker(IngestionConfig(chunk_size=1000, chunk_overlap=200))
-#     chunks = chunker.chunk(documents)
-#     print("Chunks", chunks)
-
-#     print("Storing embeddings in vector store...")
-#     vector_store = VectorStore(VectorStoreConfig(provider="pinecone"))
-#     vector_store.add_documents(chunks, namespace="test_namespace")
-#     print("Ingestion process completed.")
-
-
-
-from services.rag_service import RAGService
-from services.chat_service import ChatService
+from services.conversation_service import ConversationService
 from storage.conversation import InMemory
+from services.chat_service import ChatService
+from services.rag_service import RAGService
 from ingestion.vector_store import VectorStore
-from config import VectorStoreConfig, ModelConfig
-
-import os
-from dotenv import load_dotenv
-
-load_dotenv(".env.local")
-google_api_key = os.getenv("GEMINI_API_KEY")
-api_key = os.getenv("PINECONE_API_KEY")
+from config import VectorStoreConfig
 
 if __name__ == "__main__":
-    # print("Starting RAG service...")
+    # 1. Setup Configuration
+    config = VectorStoreConfig(api_key=pinecone_api_key)
 
-    # # Initialize vector store
-    # vector_store = VectorStore(VectorStoreConfig(api_key=api_key))
+    # 2. Initialize Core components
+    vector_store = VectorStore(config)
+    store = InMemory()
+    
+    # 3. Initialize Services
+    chat_service = ChatService()
+    rag_service = RAGService(vector_store, chat_service)
+    
+    # 4. Initialize Orchestrator
+    conversation_service = ConversationService(store, chat_service, rag_service)
 
-    # # Initialize chat service
-    # chat_service = ChatService(ModelConfig(provider="google", model_name="gemini-2.5-flash", api_key=google_api_key))
+    # 5. Run Test Call (Standard Chat)
+    print("--- Testing Standard Chat ---")
+    response_1 = conversation_service.chat(
+        conversation_id="test_session_001",
+        query="Hi, I am Hanan. Please remember my name.",
+        use_rag=False,
+        model_name="gemini-2.0-flash",
+        api_key=google_api_key
+    )
+    print(f"Assistant: {response_1}")
 
-    # # Initialize RAG service
-    # rag_service = RAGService(vector_store, chat_service, ConversationService())
-
-    # # Test RAG service
-    # query = "What is DocuFlow?"
-    # response = rag_service.chat(query, namespace="test_namespace")
-    # print("Response:", response)
-
-    conversation_service = InMemory()
-    print(conversation_service.conversations)
+    # 6. Run Test Call (Follow-up to check history)
+    print("\n--- Testing History Persistence ---")
+    response_2 = conversation_service.chat(
+        conversation_id="test_session_001",
+        query="What is my name?",
+        use_rag=False,
+        model_name="gemini-2.0-flash",
+        api_key=google_api_key
+    )
+    print(f"Assistant: {response_2}")
