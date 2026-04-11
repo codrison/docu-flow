@@ -13,7 +13,7 @@ class IngestionConfig:
 
 
 class EmbeddingConfig:
-    def __init__(self, model_name: str, api_key: str, environment: str = None):
+    def __init__(self, model_name: str, api_key: str, environment: str):
         self.model_name = model_name
         self.api_key = api_key
         self.environment = environment
@@ -26,4 +26,3 @@ class VectorStoreConfig:
         self.environment = environment
 
 
-print(VectorStoreConfig(api_key="time_to_update_api_key"))
