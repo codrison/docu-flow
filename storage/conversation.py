@@ -1,16 +1,18 @@
+from datetime import datetime
+
 class InMemory:
     def __init__(self):
         self.conversations = {}
     
-    def create_conversation(self, conversation_id):
+    def create_conversation(self, conversation_id, created_at: datetime = None, kb_ids: list[str] = None, model: str = None, title: str = None):
         if conversation_id in self.conversations:
             raise ValueError("Conversation ID already exists.")
-        self.conversations[conversation_id] = []
+        self.conversations[conversation_id] = { "kb_ids": kb_ids or [], "title": title, "created_at": created_at, "messages": []}
     
-    def add_message(self, conversation_id, role, content):
+    def add_message(self, conversation_id, model: str = None, role: str = None, content: str = None):
         if conversation_id not in self.conversations:
             raise ValueError("Conversation ID does not exist.")
-        self.conversations[conversation_id].append({"role": role, "content": content})
+        self.conversations[conversation_id]["messages"].append({"role": role, "content": content, "model": model})
 
     def get_conversation(self, conversation_id):
         if conversation_id not in self.conversations:
