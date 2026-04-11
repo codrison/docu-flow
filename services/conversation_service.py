@@ -8,13 +8,18 @@ class ConversationService:
         self.chat_service = chat_service
         self.rag_service = rag_service
 
+    def create_conversation(self, conversation_id: str, created_at=None, kb_ids: list[str] = None, title: str = None):
+        self.store.create_conversation(conversation_id=conversation_id,
+                                       created_at=created_at,
+                                       kb_ids=kb_ids,
+                                       title=title)
+
     def chat(self, conversation_id: str, query: str, use_rag: bool, model_name: str, api_key: str, **kwargs):
-        # 1. Implicitly create conversation if it doesn't exist
-        if conversation_id not in self.store.conversations:
-            self.store.conversations[conversation_id] = []
+        
+        
 
         # 2. Fetch History
-        history = self.store.get_conversation(conversation_id)
+        history = self.store.get_conversation(conversation_id)["messages"]
         
         # 3. Get Response
         if use_rag:
@@ -36,7 +41,14 @@ class ConversationService:
             )
             
         # 4. Log both query and response
-        self.store.add_message(conversation_id, "user", query)
-        self.store.add_message(conversation_id, "assistant", response)
+        self.store.add_message(conversation_id,
+                               role="user",
+                               content=query,
+                               model=model_name)
+        
+        self.store.add_message(conversation_id=conversation_id, 
+                               role="assistant", 
+                               content=response, 
+                               model=model_name)
         
         return response
