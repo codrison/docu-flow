@@ -70,7 +70,6 @@ class Conversation(Base):
     id = Column(String, primary_key=True, default=_uuid)
     user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     title = Column(String, nullable=True)
-    model_name = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("User", back_populates="conversations")
@@ -85,6 +84,7 @@ class Message(Base):
     conv_id = Column(String, ForeignKey("conversations.id", ondelete="CASCADE"), nullable=False)
     role = Column(String, nullable=False)            # "user" | "assistant"
     content = Column(Text, nullable=False)
+    model_name = Column(String, nullable=True)
     # Which KB was active when this message was sent — null = plain chat
     kb_id = Column(String, ForeignKey("knowledge_bases.id", ondelete="SET NULL"), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
