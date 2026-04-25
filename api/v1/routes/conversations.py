@@ -1,45 +1,98 @@
-from fastapi import APIRouter
+# api/v1/routes/conversations.py
 
-# App Imports
-from api.v1.schemas.conversations import CreateConversation, ResponseConversation, SendMessage
-from api.v1.dependencies import conversation_service, store
-from datetime import datetime
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
 
-router = APIRouter()
+from storage.database import get_db
+from storage.models import User
+from api.v1.schemas.conversations import (
+    CreateConversation,
+    ConversationResponse,
+    SendMessage,
+    MessageResponse,
+)
+from api.v1.dependencies import current_user, conversation_service
 
-@router.post("/conversations/", response_model=ResponseConversation)
-def create_conversation(data: CreateConversation):
-    # Generating Conversation ID
-    conversation_id = conversation_service.create_conversation(
+router = APIRouter(prefix="/conversations", tags=["conversations"])
+
+
+@router.post("/", response_model=ConversationResponse, status_code=status.HTTP_201_CREATED)
+def create_conversation(
+    data: CreateConversation,
+    db: Session = Depends(get_db),
+    user: User = Depends(current_user),
+):
+    conv = conversation_service.create_conversation(
+        db=db,
+        user_id=user.id,
         title=data.title,
         model_name=data.model_name,
-        kb_ids=data.kb_ids
     )
-   
-    return ResponseConversation(
-       conversation_id=conversation_id,
-       title=data.title,
-       model_name=data.model_name,
-       created_at=datetime.now()
-    )
-
-@router.post("/conversations/{conversation_id}/chat")
-def send_message(conversation_id: str, data: SendMessage):
-    response = conversation_service.chat(
-        conversation_id=conversation_id,
-        query=data.query,
-        model_name=data.model_name,
-        api_key=data.api_key,
-        name_space=data.name_space
-    )
-
-    return response
-
-@router.delete("/conversations/{conversation_id}")
-def delete_conversation(conversation_id: str):
-    store.delete_conversation(conversation_id=conversation_id)
+    return conv
 
 
-@router.get("/conversations/")
-def get_history():
-    return store.get_history()
+@router.get("/", response_model=list[ConversationResponse])
+def list_conversations(
+    db: Session = Depends(get_db),
+    user: User = Depends(current_user),
+):
+    return conversation_service.list_conversations(db=db, user_id=user.id)
+
+
+@router.get("/{conversation_id}", response_model=ConversationResponse)
+def get_conversation(
+    conversation_id: str,
+    db: Session = Depends(get_db),
+    user: User = Depends(current_user),
+):
+    conv = conversation_service.get_conversation(db=db, conversation_id=conversation_id, user_id=user.id)
+    if not conv:
+        raise HTTPException(status_code=404, detail="Conversation not found.")
+    return conv
+
+
+@router.get("/{conversation_id}/messages", response_model=list[MessageResponse])
+def get_messages(
+    conversation_id: str,
+    db: Session = Depends(get_db),
+    user: User = Depends(current_user),
+):
+    conv = conversation_service.get_conversation(db=db, conversation_id=conversation_id, user_id=user.id)
+    if not conv:
+        raise HTTPException(status_code=404, detail="Conversation not found.")
+    return conv.messages
+
+
+@router.post("/{conversation_id}/messages", response_model=MessageResponse)
+def send_message(
+    conversation_id: str,
+    data: SendMessage,
+    db: Session = Depends(get_db),
+    user: User = Depends(current_user),
+):
+    try:
+        response_text = conversation_service.chat(
+            db=db,
+            conversation_id=conversation_id,
+            user_id=user.id,
+            query=data.query,
+            api_key=data.api_key,
+            kb_id=data.kb_id,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+    # Return the assistant message that was just persisted
+    conv = conversation_service.get_conversation(db=db, conversation_id=conversation_id, user_id=user.id)
+    return conv.messages[-1]
+
+
+@router.delete("/{conversation_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_conversation(
+    conversation_id: str,
+    db: Session = Depends(get_db),
+    user: User = Depends(current_user),
+):
+    deleted = conversation_service.delete_conversation(db=db, conversation_id=conversation_id, user_id=user.id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Conversation not found.")

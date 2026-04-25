@@ -1,26 +1,35 @@
-from pydantic import BaseModel, Field
+# api/v1/schemas/conversations.py
+
+from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional, Dict
+from typing import Optional
+
 
 class CreateConversation(BaseModel):
     title: Optional[str] = None
     model_name: str
-    api_key: str
-    kb_ids: Optional[list[str]] = None
 
 
-class ResponseConversation(BaseModel):
-    conversation_id: str
+class ConversationResponse(BaseModel):
+    id: str
     title: Optional[str] = None
     model_name: str
-    created_at: datetime = Field(default_factory=datetime.now) # Need to understand the use of Field()
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
 
 
 class SendMessage(BaseModel):
     query: str
-    model_name = str
-    api_key: str  # Temporary, remove when auth is added
-    name_space: Optional[str] = None
+    api_key: str                        # user provides their own key per message
+    kb_id: Optional[str] = None        # null = plain chat, set = RAG against that KB
 
 
+class MessageResponse(BaseModel):
+    id: str
+    role: str
+    content: str
+    kb_id: Optional[str] = None
+    created_at: datetime
 
+    model_config = {"from_attributes": True}
