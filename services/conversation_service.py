@@ -16,12 +16,11 @@ class ConversationService:
 
     # ---- Conversation CRUD ----
 
-    def create_conversation(self, db: Session, user_id: str, title: str, model_name: str) -> Conversation:
+    def create_conversation(self, db: Session, user_id: str, title: str) -> Conversation:
         conv = Conversation(
             id=str(uuid4()),
             user_id=user_id,
             title=title,
-            model_name=model_name,
         )
         db.add(conv)
         db.commit()
@@ -60,6 +59,7 @@ class ConversationService:
         user_id: str,
         query: str,
         api_key: str,
+        model_name: str,
         kb_id: str | None = None,
     ) -> str:
         conv = self.get_conversation(db, conversation_id, user_id)
@@ -85,20 +85,20 @@ class ConversationService:
                 query=query,
                 history=history,
                 namespace=kb.namespace,
-                model_name=conv.model_name,
+                model_name=model_name,
                 api_key=api_key,
             )
         else:
             response = self.chat_service.chat(
                 query=query,
                 history=history,
-                model_name=conv.model_name,
+                model_name=model_name,
                 api_key=api_key,
             )
 
         # Persist both turns
         db.add(Message(conv_id=conversation_id, role="user", content=query, kb_id=kb_id))
-        db.add(Message(conv_id=conversation_id, role="assistant", content=response, kb_id=kb_id))
+        db.add(Message(conv_id=conversation_id, role="assistant", model_name=model_name, content=response, kb_id=kb_id))
         db.commit()
 
         return response
