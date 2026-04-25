@@ -26,7 +26,6 @@ def create_conversation(
         db=db,
         user_id=user.id,
         title=data.title,
-        model_name=data.model_name,
     )
     return conv
 
@@ -77,6 +76,7 @@ def send_message(
             user_id=user.id,
             query=data.query,
             api_key=data.api_key,
+            model_name=data.model_name,
             kb_id=data.kb_id,
         )
     except ValueError as e:
