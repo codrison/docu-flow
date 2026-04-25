@@ -24,3 +24,4 @@ class VectorStoreConfig:
         self.api_key = api_key
         self.model_name = model_name
         self.environment = environment
+
